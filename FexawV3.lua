@@ -8,7 +8,7 @@ local Mouse = LocalPlayer:GetMouse()
 
 function Library:Init(menuTitle)
     local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "ThunderZ_Ultimate_Library"
+    ScreenGui.Name = "ThunderZ_Core_XL"
     ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
     ScreenGui.ResetOnSpawn = false
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -153,7 +153,7 @@ function Library:Init(menuTitle)
     OpenButton.BackgroundTransparency = 1
     OpenButton.Size = UDim2.new(1, 0, 1, 0)
     OpenButton.Font = Enum.Font.GothamBold
-    OpenButton.Text = "OPEN HUB"
+    OpenButton.Text = "OPEN " .. (menuTitle or "HUB")
     OpenButton.TextColor3 = Color3.new(1, 1, 1)
     OpenButton.TextSize = 14
 
@@ -192,7 +192,7 @@ function Library:Init(menuTitle)
     YesBtn.Position = UDim2.new(0.1, 0, 0.6, 0)
     YesBtn.Size = UDim2.new(0.35, 0, 0, 35)
     YesBtn.Font = Enum.Font.GothamBold
-    YesBtn.Text = "Yes"
+    YesBtn.Text = "Да"
     YesBtn.TextColor3 = Color3.new(1, 1, 1)
     Instance.new("UICorner", YesBtn)
 
@@ -202,44 +202,31 @@ function Library:Init(menuTitle)
     NoBtn.Position = UDim2.new(0.55, 0, 0.6, 0)
     NoBtn.Size = UDim2.new(0.35, 0, 0, 35)
     NoBtn.Font = Enum.Font.GothamBold
-    NoBtn.Text = "No"
+    NoBtn.Text = "Нет"
     NoBtn.TextColor3 = Color3.new(1, 1, 1)
     Instance.new("UICorner", NoBtn)
 
     local function MakeDraggable(obj, dragObj)
-        local Dragging = nil
-        local DragInput = nil
-        local DragStart = nil
-        local StartPos = nil
-
+        local Dragging, DragInput, DragStart, StartPos
         local function Update(input)
             local Delta = input.Position - DragStart
             obj.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + Delta.X, StartPos.Y.Scale, StartPos.Y.Offset + Delta.Y)
         end
-
         dragObj.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                 Dragging = true
                 DragStart = input.Position
                 StartPos = obj.Position
                 input.Changed:Connect(function()
-                    if input.UserInputState == Enum.UserInputState.End then
-                        Dragging = false
-                    end
+                    if input.UserInputState == Enum.UserInputState.End then Dragging = false end
                 end)
             end
         end)
-
         dragObj.InputChanged:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-                DragInput = input
-            end
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then DragInput = input end
         end)
-
         UserInputService.InputChanged:Connect(function(input)
-            if input == DragInput and Dragging then
-                Update(input)
-            end
+            if input == DragInput and Dragging then Update(input) end
         end)
     end
 
@@ -250,8 +237,7 @@ function Library:Init(menuTitle)
         local h = 0
         while true do
             local color = Color3.fromHSV(h, 0.7, 1)
-            MainStroke.Color = color
-            OBStroke.Color = color
+            MainStroke.Color, OBStroke.Color = color, color
             h = h + 0.002
             task.wait()
         end
@@ -260,16 +246,12 @@ function Library:Init(menuTitle)
     OpenButton.MouseButton1Click:Connect(function()
         MainFrame.Visible = true
         OpenBar.Visible = false
-        TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Back), {Size = UDim2.new(0, 650, 0, 450)}):Play()
+        TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Back), {Size = UDim2.new(0, 650, 0, 480)}):Play()
     end)
 
     MinimizeButton.MouseButton1Click:Connect(function()
-        local Tween = TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0)})
-        Tween:Play()
-        Tween.Completed:Connect(function()
-            MainFrame.Visible = false
-            OpenBar.Visible = true
-        end)
+        local t = TweenService:Create(MainFrame, TweenInfo.new(0.4), {Size = UDim2.new(0, 0, 0, 0)})
+        t:Play() t.Completed:Connect(function() MainFrame.Visible, OpenBar.Visible = false, true end)
     end)
 
     CloseButton.MouseButton1Click:Connect(function()
@@ -278,23 +260,16 @@ function Library:Init(menuTitle)
     end)
 
     NoBtn.MouseButton1Click:Connect(function()
-        local Tween = TweenService:Create(ConfirmFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 0, 0, 0)})
-        Tween:Play()
-        Tween.Completed:Connect(function()
-            ConfirmFrame.Visible = false
-        end)
+        local t = TweenService:Create(ConfirmFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 0, 0, 0)})
+        t:Play() t.Completed:Connect(function() ConfirmFrame.Visible = false end)
     end)
 
-    YesBtn.MouseButton1Click:Connect(function()
-        ScreenGui:Destroy()
-    end)
+    YesBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
 
     SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
         local text = SearchBox.Text:lower()
         for _, btn in pairs(TabContainer:GetChildren()) do
-            if btn:IsA("TextButton") then
-                btn.Visible = btn.Text:lower():find(text) ~= nil
-            end
+            if btn:IsA("TextButton") then btn.Visible = btn.Text:lower():find(text) ~= nil end
         end
     end)
 
@@ -302,8 +277,7 @@ function Library:Init(menuTitle)
     local CurrentTab = nil
 
     function API:CreateTab(icon, name)
-        local TabButton = Instance.new("TextButton")
-        TabButton.Parent = TabContainer
+        local TabButton = Instance.new("TextButton", TabContainer)
         TabButton.BackgroundTransparency = 1
         TabButton.Size = UDim2.new(1, -10, 0, 40)
         TabButton.Font = Enum.Font.Gotham
@@ -312,162 +286,84 @@ function Library:Init(menuTitle)
         TabButton.TextSize = 14
         TabButton.TextXAlignment = Enum.TextXAlignment.Left
 
-        local Page = Instance.new("ScrollingFrame")
-        Page.Parent = ContentFrame
+        local Page = Instance.new("ScrollingFrame", ContentFrame)
         Page.BackgroundTransparency = 1
         Page.Size = UDim2.new(1, 0, 1, 0)
         Page.Visible = false
         Page.ScrollBarThickness = 2
         Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
 
-        local PageLayout = Instance.new("UIListLayout")
-        PageLayout.Parent = Page
+        local PageLayout = Instance.new("UIListLayout", Page)
         PageLayout.Padding = UDim.new(0, 8)
         PageLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        Instance.new("UIPadding", Page).PaddingTop = UDim.new(0, 10)
 
-        local PagePadding = Instance.new("UIPadding")
-        PagePadding.Parent = Page
-        PagePadding.PaddingTop = UDim.new(0, 10)
-
-        if not CurrentTab then
-            CurrentTab = Page
-            Page.Visible = true
-            TabButton.TextColor3 = Color3.new(1, 1, 1)
-        end
+        if not CurrentTab then CurrentTab, Page.Visible = Page, true TabButton.TextColor3 = Color3.new(1, 1, 1) end
 
         TabButton.MouseButton1Click:Connect(function()
-            if CurrentTab then
-                CurrentTab.Visible = false
-                for _, v in pairs(TabContainer:GetChildren()) do
-                    if v:IsA("TextButton") then v.TextColor3 = Color3.fromRGB(150, 150, 180) end
-                end
+            if CurrentTab then CurrentTab.Visible = false for _, v in pairs(TabContainer:GetChildren()) do if v:IsA("TextButton") then v.TextColor3 = Color3.fromRGB(150, 150, 180) end end end
+            CurrentTab, Page.Visible = Page, true TabButton.TextColor3 = Color3.new(1, 1, 1)
+        end)
+
+        local function ElAPI(parent)
+            local E = {}
+            function E:Section(text)
+                local l = Instance.new("TextLabel", parent)
+                l.BackgroundTransparency, l.Size = 1, UDim2.new(1, -20, 0, 30)
+                l.Font, l.Text, l.TextColor3 = Enum.Font.GothamBold, "↪ [ " .. text .. " ] ↩", Color3.fromRGB(130, 120, 220)
+                l.TextSize = 14
             end
-            CurrentTab = Page
-            Page.Visible = true
-            TabButton.TextColor3 = Color3.new(1, 1, 1)
-        end)
-
-        local ElementAPI = {}
-
-        function ElementAPI:Section(text)
-            local SectionLabel = Instance.new("TextLabel")
-            SectionLabel.Parent = Page
-            SectionLabel.BackgroundTransparency = 1
-            SectionLabel.Size = UDim2.new(1, -20, 0, 30)
-            SectionLabel.Font = Enum.Font.GothamBold
-            SectionLabel.Text = "↪ [ " .. text .. " ] ↩"
-            SectionLabel.TextColor3 = Color3.fromRGB(130, 120, 220)
-            SectionLabel.TextSize = 14
+            function E:AddButton(text, callback)
+                local b = Instance.new("TextButton", parent)
+                b.BackgroundColor3, b.Size = Color3.fromRGB(24, 22, 38), UDim2.new(1, -30, 0, 42)
+                b.Font, b.Text, b.TextColor3 = Enum.Font.Gotham, "  " .. text, Color3.new(1, 1, 1)
+                b.TextXAlignment = Enum.TextXAlignment.Left
+                Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
+                b.MouseButton1Click:Connect(callback)
+            end
+            function E:AddToggle(text, default, callback)
+                local s = default
+                local b = Instance.new("TextButton", parent)
+                b.BackgroundColor3, b.Size = s and Color3.fromRGB(60, 150, 80) or Color3.fromRGB(24, 22, 38), UDim2.new(1, -30, 0, 42)
+                b.Font, b.Text, b.TextColor3 = Enum.Font.Gotham, "  " .. text .. ": " .. (s and "ON" or "OFF"), Color3.new(1, 1, 1)
+                b.TextXAlignment = Enum.TextXAlignment.Left
+                Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
+                b.MouseButton1Click:Connect(function()
+                    s = not s b.Text = "  " .. text .. ": " .. (s and "ON" or "OFF")
+                    TweenService:Create(b, TweenInfo.new(0.3), {BackgroundColor3 = s and Color3.fromRGB(60, 150, 80) or Color3.fromRGB(24, 22, 38)}):Play()
+                    callback(s)
+                end)
+            end
+            function E:CreateSub(name)
+                local f = Instance.new("Frame", parent)
+                f.BackgroundTransparency, f.Size, f.AutomaticSize = 1, UDim2.new(1, -30, 0, 42), Enum.AutomaticSize.Y
+                local sb = Instance.new("TextButton", f)
+                sb.BackgroundColor3, sb.Size = Color3.fromRGB(30, 28, 48), UDim2.new(1, 0, 0, 42)
+                sb.Font, sb.Text, sb.TextColor3 = Enum.Font.GothamBold, "  [+] " .. name, Color3.new(1, 1, 1)
+                sb.TextXAlignment = Enum.TextXAlignment.Left
+                Instance.new("UICorner", sb).CornerRadius = UDim.new(0, 6)
+                local sc = Instance.new("Frame", f)
+                sc.BackgroundTransparency, sc.Position, sc.Size = 1, UDim2.new(0, 15, 0, 48), UDim2.new(1, -15, 0, 0)
+                sc.Visible, sc.AutomaticSize = false, Enum.AutomaticSize.Y
+                Instance.new("UIListLayout", sc).Padding = UDim.new(0, 6)
+                sb.MouseButton1Click:Connect(function()
+                    sc.Visible = not sc.Visible sb.Text = sc.Visible and "  [-] " .. name or "  [+] " .. name
+                end)
+                return ElAPI(sc)
+            end
+            return E
         end
-
-        function ElementAPI:AddButton(text, callback)
-            local Button = Instance.new("TextButton")
-            Button.Parent = Page
-            Button.BackgroundColor3 = Color3.fromRGB(24, 22, 38)
-            Button.Size = UDim2.new(1, -30, 0, 42)
-            Button.Font = Enum.Font.Gotham
-            Button.Text = "  " .. text
-            Button.TextColor3 = Color3.new(1, 1, 1)
-            Button.TextSize = 14
-            Button.TextXAlignment = Enum.TextXAlignment.Left
-
-            local BtnCorner = Instance.new("UICorner")
-            BtnCorner.CornerRadius = UDim.new(0, 6)
-            BtnCorner.Parent = Button
-
-            Button.MouseButton1Click:Connect(function()
-                local t = TweenService:Create(Button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 35, 60)})
-                t:Play() t.Completed:Connect(function() Button.BackgroundColor3 = Color3.fromRGB(24, 22, 38) end)
-                callback()
-            end)
-        end
-
-        function ElementAPI:AddToggle(text, default, callback)
-            local Enabled = default
-            local Toggle = Instance.new("TextButton")
-            Toggle.Parent = Page
-            Toggle.BackgroundColor3 = Enabled and Color3.fromRGB(60, 150, 80) or Color3.fromRGB(24, 22, 38)
-            Toggle.Size = UDim2.new(1, -30, 0, 42)
-            Toggle.Font = Enum.Font.Gotham
-            Toggle.Text = "  " .. text .. ": " .. (Enabled and "ON" or "OFF")
-            Toggle.TextColor3 = Color3.new(1, 1, 1)
-            Toggle.TextXAlignment = Enum.TextXAlignment.Left
-
-            Instance.new("UICorner", Toggle).CornerRadius = UDim.new(0, 6)
-
-            Toggle.MouseButton1Click:Connect(function()
-                Enabled = not Enabled
-                Toggle.Text = "  " .. text .. ": " .. (Enabled and "ON" or "OFF")
-                TweenService:Create(Toggle, TweenInfo.new(0.3), {BackgroundColor3 = Enabled and Color3.fromRGB(60, 150, 80) or Color3.fromRGB(24, 22, 38)}):Play()
-                callback(Enabled)
-            end)
-        end
-
-        function ElementAPI:CreateSub(name)
-            local SubFrame = Instance.new("Frame")
-            SubFrame.Parent = Page
-            SubFrame.BackgroundTransparency = 1
-            SubFrame.Size = UDim2.new(1, -30, 0, 42)
-            SubFrame.AutomaticSize = Enum.AutomaticSize.Y
-
-            local SubButton = Instance.new("TextButton")
-            SubButton.Parent = SubFrame
-            SubButton.BackgroundColor3 = Color3.fromRGB(30, 28, 48)
-            SubButton.Size = UDim2.new(1, 0, 0, 42)
-            SubButton.Font = Enum.Font.GothamBold
-            SubButton.Text = "  [+] " .. name
-            SubButton.TextColor3 = Color3.new(1, 1, 1)
-            SubButton.TextXAlignment = Enum.TextXAlignment.Left
-            Instance.new("UICorner", SubButton).CornerRadius = UDim.new(0, 6)
-
-            local SubContainer = Instance.new("Frame")
-            SubContainer.Parent = SubFrame
-            SubContainer.BackgroundTransparency = 1
-            SubContainer.Position = UDim2.new(0, 15, 0, 48)
-            SubContainer.Size = UDim2.new(1, -15, 0, 0)
-            SubContainer.Visible = false
-            SubContainer.AutomaticSize = Enum.AutomaticSize.Y
-
-            local SubLayout = Instance.new("UIListLayout")
-            SubLayout.Parent = SubContainer
-            SubLayout.Padding = UDim.new(0, 6)
-
-            SubButton.MouseButton1Click:Connect(function()
-                SubContainer.Visible = not SubContainer.Visible
-                SubButton.Text = SubContainer.Visible and "  [-] " .. name or "  [+] " .. name
-            end)
-
-            -- This allows nested functions
-            local SubAPI = {}
-            function SubAPI:AddButton(t, c) ElementAPI:AddButton(t, c) end -- Simplified for example
-            return SubAPI
-        end
-
-        return ElementAPI
+        return ElAPI(Page)
     end
-
     function API:Notify(msg)
-        local Notification = Instance.new("TextLabel")
-        Notification.Parent = ScreenGui
-        Notification.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
-        Notification.Size = UDim2.new(0, 250, 0, 50)
-        Notification.Position = UDim2.new(1, 20, 1, -70)
-        Notification.Font = Enum.Font.GothamBold
-        Notification.Text = msg
-        Notification.TextColor3 = Color3.new(1, 1, 1)
-        Notification.TextSize = 14
-        Instance.new("UICorner", Notification)
-        local NStroke = Instance.new("UIStroke", Notification)
-        NStroke.Thickness = 2
-        NStroke.Color = MainStroke.Color
-
-        TweenService:Create(Notification, TweenInfo.new(0.5, Enum.EasingStyle.Back), {Position = UDim2.new(1, -270, 1, -70)}):Play()
-        task.delay(4, function()
-            TweenService:Create(Notification, TweenInfo.new(0.5), {Position = UDim2.new(1, 20, 1, -70)}):Play()
-            task.wait(0.5) Notification:Destroy()
-        end)
+        local n = Instance.new("TextLabel", ScreenGui)
+        n.BackgroundColor3, n.Size, n.Position = Color3.fromRGB(30, 30, 45), UDim2.new(0, 250, 0, 50), UDim2.new(1, 20, 1, -70)
+        n.Font, n.Text, n.TextColor3, n.TextSize = Enum.Font.GothamBold, msg, Color3.new(1, 1, 1), 14
+        Instance.new("UICorner", n)
+        local s = Instance.new("UIStroke", n) s.Thickness, s.Color = 2, MainStroke.Color
+        TweenService:Create(n, TweenInfo.new(0.5, Enum.EasingStyle.Back), {Position = UDim2.new(1, -270, 1, -70)}):Play()
+        task.delay(4, function() TweenService:Create(n, TweenInfo.new(0.5), {Position = UDim2.new(1, 20, 1, -70)}):Play() task.wait(0.5) n:Destroy() end)
     end
-
     return API
 end
 
