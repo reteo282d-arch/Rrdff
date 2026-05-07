@@ -143,6 +143,8 @@ function Library:Init(menuTitle)
     local mpl = Instance.new("UIListLayout", mP)
     mpl.Padding = UDim.new(0,5)
 
+    local order = 0
+
     local API = {}
 
     function API:Notify(text)
@@ -218,6 +220,8 @@ function Library:Init(menuTitle)
         container.Size = UDim2.new(1,-10,0,0)
         container.AutomaticSize = Enum.AutomaticSize.Y
         container.BackgroundTransparency = 1
+        container.Visible = false
+        container.LayoutOrder = order
 
         local cl = Instance.new("UIListLayout", container)
         cl.Padding = UDim.new(0,5)
@@ -227,11 +231,21 @@ function Library:Init(menuTitle)
         btn.BackgroundColor3 = Color3.fromRGB(30,30,30)
         btn.TextColor3 = Color3.new(1,1,1)
         btn.Text = "v "..name.." v"
-
+        btn.LayoutOrder = order
         Instance.new("UICorner", btn)
+
+        order += 1
 
         btn.MouseButton1Click:Connect(function()
             container.Visible = not container.Visible
+
+            if container.Visible then
+                container.LayoutOrder = -1000
+                btn.LayoutOrder = -1000
+            else
+                container.LayoutOrder = order
+                btn.LayoutOrder = order
+            end
 
             btn.Text =
                 (container.Visible and "^ " or "v ")
