@@ -8,7 +8,7 @@ local Mouse = LocalPlayer:GetMouse()
 
 function Library:Init(menuTitle)
     local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "ThunderZ_Core_350x350"
+    ScreenGui.Name = "ThunderZ_Core_450x350"
     ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
     ScreenGui.ResetOnSpawn = false
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -85,7 +85,7 @@ function Library:Init(menuTitle)
     Sidebar.Parent = MainFrame
     Sidebar.BackgroundColor3 = Color3.fromRGB(18, 16, 26)
     Sidebar.Position = UDim2.new(0, 0, 0, 40)
-    Sidebar.Size = UDim2.new(0, 120, 1, -40)
+    Sidebar.Size = UDim2.new(0, 130, 1, -40)
     Sidebar.BorderSizePixel = 0
 
     local SearchBox = Instance.new("TextBox")
@@ -126,8 +126,8 @@ function Library:Init(menuTitle)
     ContentFrame.Name = "ContentFrame"
     ContentFrame.Parent = MainFrame
     ContentFrame.BackgroundTransparency = 1
-    ContentFrame.Position = UDim2.new(0, 120, 0, 40)
-    ContentFrame.Size = UDim2.new(1, -120, 1, -40)
+    ContentFrame.Position = UDim2.new(0, 130, 0, 40)
+    ContentFrame.Size = UDim2.new(1, -130, 1, -40)
 
     local OpenBar = Instance.new("Frame")
     OpenBar.Name = "OpenBar"
@@ -245,7 +245,7 @@ function Library:Init(menuTitle)
     OpenButton.MouseButton1Click:Connect(function()
         MainFrame.Visible = true
         OpenBar.Visible = false
-        TweenService:Create(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back), {Size = UDim2.new(0, 350, 0, 350)}):Play()
+        TweenService:Create(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back), {Size = UDim2.new(0, 450, 0, 350)}):Play()
     end)
 
     MinimizeButton.MouseButton1Click:Connect(function()
